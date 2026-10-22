@@ -1,0 +1,101 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>chess.com mock</title>
+<style>
+  body { background: #f4f4f2; font: 14px system-ui, sans-serif; padding: 24px; }
+  wc-chess-board { display: grid; grid-template: repeat(8, 56px) / repeat(8, 56px); }
+  .sq { outline: 1px solid #bbb; color: #999; font-size: 10px; padding: 2px; }
+  .light { background: #f0d9b5; }
+  .dark { background: #b58863; }
+  .piece { z-index: 1; font: 30px/56px monospace; text-align: center; }
+  .wp, .wn, .wb, .wr, .wq, .wk { color: #fff; text-shadow: 0 0 2px #000; }
+  .bp, .bn, .bb, .br, .bq, .bk { color: #111; }
+  wc-simple-move-list { display: flex; gap: 8px; margin: 12px 0; }
+  .node { background: #e6e6e6; padding: 4px 8px; }
+  .clocks { display: flex; gap: 12px; }
+  .clock-component { background: #ddd; padding: 6px 10px; }
+  .clock-player-turn { background: #9bd; }
+  .live-game-buttons-game-over { display: flex; gap: 8px; margin-top: 12px; }
+</style>
+<wc-chess-board class="board">
+  <div class="piece wp square-12"></div>
+  <div class="piece wp square-22"></div>
+  <div class="piece wp square-32"></div>
+  <div class="piece wp square-42"></div>
+  <div class="piece wp square-62"></div>
+  <div class="piece wp square-72"></div>
+  <div class="piece wp square-82"></div>
+  <div class="piece wp square-54"></div>
+  <div class="piece bp square-17"></div>
+  <div class="piece bp square-27"></div>
+  <div class="piece bp square-37"></div>
+  <div class="piece bp square-47"></div>
+  <div class="piece bp square-67"></div>
+  <div class="piece bp square-77"></div>
+  <div class="piece bp square-87"></div>
+  <div class="piece bp square-55"></div>
+  <div class="piece wr square-11"></div>
+  <div class="piece wn square-21"></div>
+  <div class="piece wb square-31"></div>
+  <div class="piece wq square-41"></div>
+  <div class="piece wk square-51"></div>
+  <div class="piece wb square-61"></div>
+  <div class="piece wn square-63"></div>
+  <div class="piece wr square-81"></div>
+  <div class="piece br square-18"></div>
+  <div class="piece bn square-78"></div>
+  <div class="piece bb square-38"></div>
+  <div class="piece bq square-48"></div>
+  <div class="piece bk square-58"></div>
+  <div class="piece bb square-68"></div>
+  <div class="piece bn square-36"></div>
+  <div class="piece br square-88"></div>
+</wc-chess-board>
+<wc-simple-move-list>
+  <div class="node">1. e4</div>
+  <div class="node">e5</div>
+  <div class="node">2. Nf3</div>
+  <div class="node">Nc6</div>
+</wc-simple-move-list>
+<div class="clocks">
+  <div class="clock-component clock-player-turn clock-white">10:00</div>
+  <div class="clock-component clock-black">10:00</div>
+</div>
+<button id="finish">End game</button>
+<script>
+  const FILES = 'abcdefgh';
+  const board = document.querySelector('wc-chess-board');
+
+  // Board
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const sq = document.createElement('div');
+      sq.className = 'sq ' + ((row + col) % 2 ? 'dark' : 'light');
+      sq.style.gridArea = (row + 1) + ' / ' + (col + 1);
+      sq.textContent = FILES[col] + (8 - row);
+      board.append(sq);
+    }
+  }
+
+  // Pieces
+  for (const piece of document.querySelectorAll('.piece')) {
+    const square = [...piece.classList].find(c => c.startsWith('square-'));
+    const code = [...piece.classList].find(c => /^[wb][pnbrqk]$/.test(c));
+    piece.style.gridArea = (9 - Number(square[8])) + ' / ' + Number(square[7]);
+    piece.textContent = code[0] === 'w' ? code[1].toUpperCase() : code[1];
+  }
+  // Clicks
+  window.clicks = [];
+  document.addEventListener('mousedown', event => {
+    window.clicks.push([event.clientX, event.clientY]);
+  });
+
+  // Game over
+  document.querySelector('#finish').addEventListener('click', () => {
+    document.body.insertAdjacentHTML('beforeend',
+      '<div class="live-game-buttons-game-over">' +
+        '<button>New 10 min</button>' +
+        '<button>Rematch</button>' +
+      '</div>');
+  });
+</script>
